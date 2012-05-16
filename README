@@ -1,0 +1,13 @@
+===== ABOUT =====
+
+A simple, single-page web application that allows you to create, read, update and delete drinks that you like. Uses Mojolicious::Lite to create a RESTful interface, and Backbone.js to manage the communication between the server and the client.
+
+===== REQUIRED =====
+
+===== INSTALL =====
+
+===== RUN =====
+
+===== RESTFUL INTERFACE =====
+
+
