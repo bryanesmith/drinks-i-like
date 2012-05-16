@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Launches server on specified port
+# 
+
+PORT=3000
+
+# Determine location of server app
+current_dir=`dirname "$0"`
+server_app="${current_dir}/../lib/server.pl"
+
+# Launch server
+$server_app daemon -l http://*:${PORT}
+

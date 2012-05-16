@@ -1,0 +1,7 @@
+package MyConfig;
+
+sub db_name     { 'drinks_i_like' }
+sub db_username { 'drinks_i_like' }
+sub db_password { 'mysecretpassword' }
+
+1;
