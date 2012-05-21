@@ -21,7 +21,7 @@ A simple, single-page web application that allows you to create, read, update an
   Query OK, 1 row affected (0.07 sec)
 
 
-  mysql> GRANT USAGE ON `drinks_i_like`.* TO drinks_i_like@localhost IDENTIFIED BY 'mysecretpassword';
+  mysql> GRANT ALL PRIVILEGES ON `drinks_i_like`.* TO drinks_i_like@localhost IDENTIFIED BY 'mysecretpassword';
   Query OK, 0 rows affected (0.15 sec)
 
   mysql>
@@ -84,7 +84,7 @@ For more information on building a RESTful interface, see: [http://goo.gl/YjyDM]
         console.dir(jqXHR);
     });
 
-2. (Read)   To get a drink: GET /api/drink/id
+2. (Read)   To get a drink: GET /api/drink/:id
 
     jQuery.get("/api/drink/1", function(data, textStatus, jqXHR) {
             console.log("Response: ");
@@ -102,7 +102,7 @@ For more information on building a RESTful interface, see: [http://goo.gl/YjyDM]
         console.dir(jqXHR);
     });
 
-3. (Update) To update a drink: UPDATE /api/drink/id
+3. (Update) To update a drink: PUT /api/drink/:id
 
     jQuery.ajax({
         url: "/api/drink/1",
@@ -118,7 +118,7 @@ For more information on building a RESTful interface, see: [http://goo.gl/YjyDM]
         }
     });
 
-4. (Delete) To delete a drink: DELETE /drink/id
+4. (Delete) To delete a drink: DELETE /api/drink/:id
 
     jQuery.ajax({
         url: "/api/products/1", 
