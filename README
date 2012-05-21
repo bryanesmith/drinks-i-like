@@ -68,4 +68,72 @@ You can modify the PORT variable in this script to select a different port.
 
 ===== RESTFUL INTERFACE =====
 
+For each of the following, if you visit the site's home page (http://127.0.0.1/ by default), you can run the specified jQuery command from the JavaScript console in your browser to test the functionality.
+
+For more information on building a RESTful interface, see: [http://goo.gl/YjyDM]
+
+1. (Create) To add a drink: POST /api/drink/
+
+    jQuery.post("/api/drink", {
+      "title": "Espresso",
+      "description": '"It is inhumane, in my opinion, to force people who have a genuine medical need for coffee to wait in line behind people who apparently view it as some kind of recreational activity." - Dave Barry',
+    }, function (data, textStatus, jqXHR) {
+        console.log("Response: "); 
+        console.dir(data); 
+        console.log(textStatus); 
+        console.dir(jqXHR);
+    });
+
+2. (Read)   To get a drink: GET /api/drink/id
+
+    jQuery.get("/api/drink/1", function(data, textStatus, jqXHR) {
+            console.log("Response: ");
+      console.dir(data);
+      console.log(textStatus);
+      console.dir(jqXHR);
+    });
+
+  Or to get all drinks: GET /api/drink/
+
+    jQuery.get("/api/drink/", function (data, textStatus, jqXHR) {
+            console.log("Response: ");
+        console.dir(data);
+        console.log(textStatus);
+        console.dir(jqXHR);
+    });
+
+3. (Update) To update a drink: UPDATE /api/drink/id
+
+    jQuery.ajax({
+        url: "/api/drink/1",
+        type: "PUT",
+        data: {
+          "description": '"So put down your Muscle and Fiction, do your squats, drink your milk, and pay better attention to the answers when you ask the questions." - Mark Rippetoe'
+        },
+        success: function (data, textStatus, jqXHR) {
+            console.log("Response: ");
+            console.dir(data);
+            console.log(textStatus);
+            console.dir(jqXHR);
+        }
+    });
+
+4. (Delete) To delete a drink: DELETE /drink/id
+
+    jQuery.ajax({
+        url: "/api/products/1", 
+        type: "DELETE",
+        success: function (data, textStatus, jqXHR) {
+            console.log("Response: ");
+            console.dir(data); 
+            console.log(textStatus); 
+            console.dir(jqXHR); 
+        }
+    });
+
+===== USEFUL RESOURCES =====
+
+* Develop a RESTful API Using Node.js With Express and Mongoose [http://goo.gl/G1u4j]
+
+* Designing a RESTful Web Application [http://goo.gl/YjyDM]
 
