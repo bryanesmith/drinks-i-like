@@ -11,5 +11,5 @@ CREATE TABLE `drink` (
 );
 
 -- Test data.
-INSERT INTO `drink`( `title`, `description` ) VALUES ( 'milk', 'Preferably whole milk.' );
+INSERT INTO `drink`( `title`, `description` ) VALUES ( 'milk', '"Baby mammals drink milk, and you sir, are a baby mammal." - Mark Rippetoe' );
 
