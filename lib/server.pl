@@ -48,6 +48,29 @@ get '/' => sub {
 post '/api/drink' => sub {
   my $self = shift;
 
+  # Return error if missing parameter (400)
+
+  my $dbh = get_dbh();
+
+  my $sql = 'INSERT INTO `drink`(`title`, `description`) VALUES (?, ?)';
+
+  my $sth = $dbh->prepare($sql) or die $dbh->errstr;
+  $sth->execute( 
+    $self->param('title'), 
+    $self->param('description') );
+
+  # Return error if failed to add (401)
+
+
+  $sql = 'SELECT * FROM `drink` WHERE `title` = ? AND `description` = ?';
+
+  $sth = $dbh->prepare($sql) or die $dbh->errstr;
+  $sth->execute( 
+    $self->param('title'), 
+    $self->param('description') ) or die $dbh->errstr;
+
+  # Return 201 & id
+  return $self->render_json( $sth->fetchrow_hashref );
 };
 
 # Get all drinks
