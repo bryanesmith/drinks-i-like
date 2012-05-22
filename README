@@ -2,14 +2,18 @@
 
 A simple, single-page web application that allows you to create, read, update and delete drinks that you like. Uses Mojolicious::Lite to create a RESTful interface, and Backbone.js to manage the communication between the server and the client.
 
-===== REQUIRED =====
+===== INSTALL =====
+
+Required:
 
   * MySQL (5.1.62 or greater)
   * Perl (5.10.1 or greater) and the following modules:
     - DBI and DBD::mysql
   * Mojolicious
 
-===== INSTALL =====
+Optional:
+
+  * Test::More
 
 1. From your terminal, navigate into the root directory for this project:
 
@@ -108,7 +112,7 @@ For more information on building a RESTful interface, see: [http://goo.gl/YjyDM]
         url: "/api/drink/1",
         type: "PUT",
         data: {
-          "description": '"So put down your Muscle and Fiction, do your squats, drink your milk, and pay better attention to the answers when you ask the questions." - Mark Rippetoe'
+          "description": '"Baby mammals drink milk, and you sir, are a baby mammal." - Mark Rippetoe'
         },
         success: function (data, textStatus, jqXHR) {
             console.log("Response: ");
