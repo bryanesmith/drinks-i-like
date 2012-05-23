@@ -36,7 +36,7 @@ $expect = {
   'description' => $drink->{'description'},
 };
 
-$t->post_form_ok('/api/drink', $drink )->status_is(200)->json_content_is( $expect );
+$t->post_form_ok('/api/drink', $drink )->status_is(201)->json_content_is( $expect );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Try to add a drink missing description, title
@@ -59,7 +59,7 @@ $drink = {
   'description' => 'It does a body good.'
 };
 
-$t->post_form_ok('/api/drink', $drink )->status_is(400)->json_content_is( [] );
+$t->post_form_ok('/api/drink', $drink )->status_is(409)->json_content_is( [] );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Get drinks

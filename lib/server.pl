@@ -81,7 +81,7 @@ sub handle_get_drinks {
 sub handle_post_drink {
   my $self = shift;
 
-  my $title = $self->param( 'title' );
+  my $title       = $self->param( 'title' );
   my $description = $self->param( 'description' );
 
   # Return error if missing parameter (400)
@@ -89,13 +89,13 @@ sub handle_post_drink {
     return $self->render_json( [], status => 400 );
   }
 
-  # Return error if not add drink
+  # Return error if not add drink (conflict, 409)
   if( ! add_drink( $title, $description ) ) {
-    return $self->render_json( [], status => 400 );
+    return $self->render_json( [], status => 409 );
   }
 
   # Return 201 & id
-  return $self->render_json( get_drink( $title ) );
+  return $self->render_json( get_drink( $title ), status => 201 );
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -123,6 +123,7 @@ sub add_drink {
     my $success = $sth->execute( $title, $description );
   };
   if ($@) {
+    # Conflict
     print "ERROR: $@ (while adding drink)" . "\n";
     return 0;
   }
@@ -157,7 +158,6 @@ sub get_drink {
   my $sth = $dbh->prepare($sql) or die $dbh->errstr;
   $sth->execute( $title ) or die $dbh->errstr;
 
-  # Return 201 & id
   return $sth->fetchrow_hashref;
 
 }
