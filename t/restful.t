@@ -1,12 +1,16 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
-use Mojo::UserAgent;
-use Data::Dumper;
+use Test::More tests => 6;
+use Test::Mojo;
 
-my $ua = Mojo::UserAgent->new;
-my $host = 'http://127.0.0.1:3000';
+use FindBin;
+require "$FindBin::Bin/../lib/server.pl";
+
+#my $ua = Mojo::UserAgent->new;
+#my $host = 'http://127.0.0.1:3000';
+
+my $t = Test::Mojo->new;
 
 my ( $response, $expect );
 
@@ -17,9 +21,7 @@ $expect = {
   'description' => '"Milk is for babies. When you grow up you have to drink beer." - Arnold Schwarzenegger',
 };
 
-$response = $ua->get($host . '/api/drink' )->res->json;
-
-is_deeply( $response, $expect, 'Should be 1 drink - the default.' );
+$t->get_ok('/api/drink')->status_is(200)->json_content_is( $expect );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Add drink
@@ -34,9 +36,7 @@ $expect = {
   'description' => $drink->{'description'},
 };
 
-$response = $ua->post_form( $host . '/api/drink', $drink )->res->json;
-
-is_deeply( $response, $expect, 'Should be drink just added.' );
+$t->post_form_ok('/api/drink', $drink )->status_is(200)->json_content_is( $expect );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Get drinks

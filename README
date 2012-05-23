@@ -14,6 +14,7 @@ Required:
 Optional:
 
   * Test::More
+  * FindBin
 
 1. From your terminal, navigate into the root directory for this project:
 
