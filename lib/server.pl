@@ -38,45 +38,100 @@ app->static->root( app->home->rel_dir('../public') );
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 # Home page
-get '/' => sub {
+get '/'               => \&handle_home;
+
+# Add a drink
+post '/api/drink'     => \&handle_post_drink;
+
+# Get all drinks
+get '/api/drink'      => \&handle_get_drinks;
+
+# Get drink
+get '/api/drink/:id'  => \&handle_get_drink;
+
+# Update a drink
+put '/api/drink/:id'  => \&handle_put_drink;
+
+# Delete a drink
+del '/api/drink/:id'   => \&handle_delete_drink;
+
+app->start;
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# Controller
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub handle_home {
   my $self = shift;
 
   $self->render('index');
-};
+}
 
-# Add a drink
-post '/api/drink' => sub {
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub handle_get_drink {
+  my $self = shift;
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub handle_get_drinks {
+  my $self = shift;
+  return $self->render_json( @{ get_drinks() } );
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub handle_post_drink {
   my $self = shift;
 
+  my $title = $self->param( 'title' );
+  my $description = $self->param( 'description' );
+
   # Return error if missing parameter (400)
+  if ( !defined($title) || !defined( $description ) ) {
+    return $self->render_json( [], status => 400 );
+  }
+
+  # Return error if not add drink
+  if( ! add_drink( $title, $description ) ) {
+    return $self->render_json( [], status => 400 );
+  }
+
+  # Return 201 & id
+  return $self->render_json( get_drink( $title ) );
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub handle_put_drink {
+  my $self = shift;
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+sub handle_delete_drink {
+  my $self = shift;
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub add_drink {
+  my ( $title, $description ) = @_;
 
   my $dbh = get_dbh();
 
   my $sql = 'INSERT INTO `drink`(`title`, `description`) VALUES (?, ?)';
 
-  my $sth = $dbh->prepare($sql) or die $dbh->errstr;
-  $sth->execute( 
-    $self->param('title'), 
-    $self->param('description') );
+  my $sth;
 
-  # Return error if failed to add (401)
+  eval {
+    $sth = $dbh->prepare($sql) or die $dbh->errstr;
+    my $success = $sth->execute( $title, $description );
+  };
+  if ($@) {
+    print "ERROR: $@ (while adding drink)" . "\n";
+    return 0;
+  }
 
+  return 1;
+}
 
-  $sql = 'SELECT * FROM `drink` WHERE `title` = ? AND `description` = ?';
-
-  $sth = $dbh->prepare($sql) or die $dbh->errstr;
-  $sth->execute( 
-    $self->param('title'), 
-    $self->param('description') ) or die $dbh->errstr;
-
-  # Return 201 & id
-  return $self->render_json( $sth->fetchrow_hashref );
-};
-
-# Get all drinks
-get '/api/drink' => sub {
-  my $self = shift;
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub get_drinks {
   my $dbh = get_dbh();
 
   my $sql = 'SELECT * FROM `drink`';
@@ -84,31 +139,29 @@ get '/api/drink' => sub {
   my $sth = $dbh->prepare($sql) or die $dbh->errstr;
   $sth->execute() or die $dbh->errstr;
 
-  my (@rows, $row);
-  push @rows, $row while ( $row = $sth->fetchrow_hashref );
+  my ($rows, $row);
+  push @$rows, $row while ( $row = $sth->fetchrow_hashref );
 
-  return $self->render_json( @rows );
-};
+  return $rows;
+}
 
-# Get drink
-get '/api/drink/:id' => sub {
-  my $self = shift;
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub get_drink {
 
-};
+  my( $title ) = @_;
 
-# Update a drink
-put '/api/drink/:id' => sub {
-  my $self = shift;
+  my $dbh = get_dbh();
 
-};
+  my $sql = 'SELECT * FROM `drink` WHERE `title` = ?';
 
-# Delete a drink
-del '/api/drink/:id' => sub {
-  my $self = shift;
+  my $sth = $dbh->prepare($sql) or die $dbh->errstr;
+  $sth->execute( $title ) or die $dbh->errstr;
 
-};
+  # Return 201 & id
+  return $sth->fetchrow_hashref;
 
-app->start;
+}
+
 __DATA__
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

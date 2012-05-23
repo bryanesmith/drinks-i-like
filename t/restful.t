@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 15;
 use Test::Mojo;
 
 use FindBin;
@@ -12,7 +12,7 @@ require "$FindBin::Bin/../lib/server.pl";
 
 my $t = Test::Mojo->new;
 
-my ( $response, $expect );
+my ( $response, $expect, $drink );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 $expect = {
@@ -25,7 +25,7 @@ $t->get_ok('/api/drink')->status_is(200)->json_content_is( $expect );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Add drink
-my $drink = {
+$drink = {
   'title' => 'espresso',
   'description' => '"It is inhumane, in my opinion, to force people who have a genuine medical need for coffee to wait in line behind people who apparently view it as some kind of recreational activity." - Dave Barry',
 };
@@ -37,6 +37,29 @@ $expect = {
 };
 
 $t->post_form_ok('/api/drink', $drink )->status_is(200)->json_content_is( $expect );
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Try to add a drink missing description, title
+$drink = {
+  'title' => "Bell's Porter"
+};
+
+$t->post_form_ok('/api/drink', $drink )->status_is(400)->json_content_is( [] );
+
+$drink = {
+  'description' => "A darn good porter."
+};
+
+$t->post_form_ok('/api/drink', $drink )->status_is(400)->json_content_is( [] );
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Try to add milk again
+$drink = {
+  'title' => "milk",
+  'description' => 'It does a body good.'
+};
+
+$t->post_form_ok('/api/drink', $drink )->status_is(400)->json_content_is( [] );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Get drinks
