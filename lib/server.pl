@@ -6,6 +6,7 @@ use DBI;
 use File::Basename;
 use lib dirname (__FILE__);
 use MyConfig;
+use JSON;
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sub get_dbh {
@@ -69,6 +70,15 @@ sub handle_home {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub handle_get_drink {
   my $self = shift;
+  
+  my $id          = $self->param( 'id' );
+
+  # Return error if missing parameter (400)
+  if ( !defined($id) ) {
+    return $self->render_json( [], status => 400 );
+  }
+
+  return $self->render_json( get_drink_by_id( $id ), status => 200 );
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -95,17 +105,48 @@ sub handle_post_drink {
   }
 
   # Return 201 & id
-  return $self->render_json( get_drink( $title ), status => 201 );
+  return $self->render_json( get_drink_by_title( $title ), status => 201 );
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub handle_put_drink {
   my $self = shift;
+  my $id          = $self->param( 'id' );
+  my $drink       = decode_json( $self->req->content->asset->{'content'} );
+
+  # Return error if missing parameter (400)
+  if ( !defined($id) || !defined( $drink ) || !defined($drink->{'title'}) || !defined($drink->{'description'}) ) {
+    return $self->render_json( [], status => 400 );
+  }
+
+  $drink = update_drink( $id, $drink->{'title'}, $drink->{'description'} );
+
+  if ( ! defined( $drink ) ) {
+    return $self->render_json( [], status => 400 );
+  }
+
+  return $self->render_json( $drink, status => 200 );
+
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub handle_delete_drink {
   my $self = shift;
+
+  my $id          = $self->param( 'id' );
+
+  # Return error if missing parameter (400)
+  if ( ! defined($id) ) {
+    return $self->render_json( [], status => 400 );
+  }
+
+  my $drink = delete_drink( $id );
+
+  if ( ! defined( $drink ) ) {
+    return $self->render_json( [], status => 400 );
+  }
+
+  return $self->render_json( $drink, status => 200 );
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -132,6 +173,63 @@ sub add_drink {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub delete_drink {
+  my ( $id ) = @_;
+
+  my $drink = get_drink_by_id( $id );
+
+  return undef if ! defined( $drink );
+
+  my $dbh = get_dbh();
+
+  my $sql = 'DELETE FROM `drink` WHERE `id` = ?';
+
+  my $sth;
+
+  eval {
+    $sth = $dbh->prepare($sql) or die $dbh->errstr;
+    my $success = $sth->execute( $id );
+  };
+  if ($@) {
+    # Conflict
+    print "ERROR: $@ (while deleting drink)" . "\n";
+    return undef;
+  }
+
+  return $drink;
+
+}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub update_drink {
+  my ( $id, $title, $description ) = @_;
+
+  my $drink = get_drink_by_id( $id );
+
+  return undef if ! defined( $drink );
+
+  my $dbh = get_dbh();
+
+  my $sql = 'UPDATE `drink` SET `title` = ?, `description` = ? WHERE `id` = ?';
+
+  my $sth;
+
+  eval {
+    $sth = $dbh->prepare($sql) or die $dbh->errstr;
+    my $success = $sth->execute( $title, $description, $id );
+  };
+  if ($@) {
+    # Conflict
+    print "ERROR: $@ (while updating drink)" . "\n";
+    return undef;
+  }
+
+  return $drink;
+
+}
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 sub get_drinks {
   my $dbh = get_dbh();
 
@@ -147,7 +245,7 @@ sub get_drinks {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sub get_drink {
+sub get_drink_by_title {
 
   my( $title ) = @_;
 
@@ -161,6 +259,23 @@ sub get_drink {
   return $sth->fetchrow_hashref;
 
 }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+sub get_drink_by_id {
+
+  my( $id ) = @_;
+
+  my $dbh = get_dbh();
+
+  my $sql = 'SELECT * FROM `drink` WHERE `id` = ?';
+
+  my $sth = $dbh->prepare($sql) or die $dbh->errstr;
+  $sth->execute( $id ) or die $dbh->errstr;
+
+  return $sth->fetchrow_hashref;
+
+}
+
 
 __DATA__
 
