@@ -25,7 +25,7 @@ push @drinks, $initial_drink;
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Test get drinks matches our running list
-$t->get_ok('/api/drink')->status_is(200)->json_content_is( @drinks );
+$t->get_ok('/api/drink')->status_is(200)->json_content_is( \@drinks );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Add drink
@@ -68,7 +68,7 @@ $t->post_form_ok('/api/drink', $drink )->status_is(409)->json_content_is( [] );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Test get drinks matches our running list
-$t->get_ok('/api/drink')->status_is(200)->json_content_is( @drinks );
+$t->get_ok('/api/drink')->status_is(200)->json_content_is( \@drinks );
 
 # Test get individual drinks
 for my $drink ( @drinks ) {
@@ -82,7 +82,7 @@ $t->delete_ok( '/api/drink/' . $drink->{'id'} )->status_is(200)->json_content_is
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Test get drinks matches our running list
-$t->get_ok('/api/drink')->status_is(200)->json_content_is( @drinks );
+$t->get_ok('/api/drink')->status_is(200)->json_content_is( \@drinks );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Update drink
@@ -114,6 +114,6 @@ $t->post_form_ok('/api/drink', $drink )->status_is(201)->json_content_is( $expec
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Test get drinks matches our running list
-$t->get_ok('/api/drink')->status_is(200)->json_content_is( @drinks );
+$t->get_ok('/api/drink')->status_is(200)->json_content_is( \@drinks );
 
 

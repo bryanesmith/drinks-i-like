@@ -84,15 +84,36 @@ sub handle_get_drink {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub handle_get_drinks {
   my $self = shift;
-  return $self->render_json( @{ get_drinks() } );
+  return $self->render_json( get_drinks() );
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub handle_post_drink {
+
   my $self = shift;
 
   my $title       = $self->param( 'title' );
   my $description = $self->param( 'description' );
+
+
+  # Use JSON content if parameter not defined
+  if ( defined( $self->req->content ) ) {
+
+    our $drink;
+
+    eval {
+     $drink = decode_json( $self->req->content->asset->{'content'} );
+    };
+
+    if ( defined( $drink ) ) {
+
+      $title = $drink->{'title'} if !defined($title) && defined($drink->{'title'});
+
+      $description = $drink->{'description'} if !defined($description) && defined($drink->{'description'});
+
+    }
+
+  }
 
   # Return error if missing parameter (400)
   if ( !defined($title) || !defined( $description ) ) {
@@ -239,6 +260,7 @@ sub get_drinks {
   $sth->execute() or die $dbh->errstr;
 
   my ($rows, $row);
+  $rows = [];
   push @$rows, $row while ( $row = $sth->fetchrow_hashref );
 
   return $rows;
@@ -292,7 +314,10 @@ __DATA__
 <html>
   <head>
     <title><%= title %></title>
-    <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script src="/js/jquery.js"></script>
+    <script src="/js/json2.js"></script>
+    <script src="/js/underscore.js"></script>
+    <script src="/js/backbone.js"></script>
     <script src="/js/library.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/screen.css"/>
   </head>
