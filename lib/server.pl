@@ -306,8 +306,38 @@ __DATA__
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 @@ index.html.ep
 % layout 'default';
-% title 'Welcome';
-<p>Foo.</p>
+% title 'Drinks I Like';
+<aside>
+  <form name="">
+    <h1>New Drink</h1>
+    <label for="title">Name</label>
+    <input type="text" name="title" />
+    <label for="description">Description</label>
+    <textarea name="description"></textarea>
+    <input type="submit" value="Add drink" />
+  </form>
+</aside>
+<% my $rows = [
+    { title => 'Test #1', description => 'Testing a description #1' },
+    { title => 'Test #2', description => 'Testing a description #2' },
+    { title => 'Test #3', description => 'Testing a description #3' },  
+  ]; %>
+<section>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>&nbsp;</th>
+    </tr>
+    <% for my $row ( @$rows ) { %>
+      <tr>
+        <td><input class="title" name="" value="<%= $row->{'title'} %>" /></td>
+        <td><input class="description" name="" value="<%= $row->{'description'} %>" /></td>
+        <td><a href="#">x</a></td>
+      </tr>
+    <% } %>
+  </table>
+</section>
  
 @@ layouts/default.html.ep
 <!doctype html>
@@ -318,8 +348,17 @@ __DATA__
     <script src="/js/json2.js"></script>
     <script src="/js/underscore.js"></script>
     <script src="/js/backbone.js"></script>
+    <script src="/js/modernizr.custom.76020.js"></script>
     <script src="/js/library.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/screen.css"/>
   </head>
-  <body><%= content %></body>
+  <body>
+    <header>
+      <h1><%= title %></h1>
+    </header>
+    <div role="main">
+      <%= content %>
+    </div>
+  </body>
 </html>

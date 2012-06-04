@@ -1,0 +1,30 @@
+html, body {
+  height: 100%;
+}
+
+header, div[role=main] {
+  width: 50em; 
+}
+
+aside {
+  width: 15em;
+  margin-left: 1.25em;
+  float: right;
+}
+
+section {
+  width: 31.25em; /* 15em * 2 + 1.25em */
+}
+
+section input {
+  border-width: 0;
+  background-color: transparent;
+}
+
+section input.title {
+  width: 10em;
+}
+
+th {
+  text-align: left;
+}
