@@ -25,6 +25,14 @@ section input.title {
   width: 10em;
 }
 
+section textarea.description {
+  height: 4em;
+}
+
 th {
   text-align: left;
+}
+
+td {
+  padding: 1em 1em 0 0;
 }

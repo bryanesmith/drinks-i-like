@@ -314,7 +314,7 @@ __DATA__
     <input type="text" name="title" />
     <label for="description">Description</label>
     <textarea name="description"></textarea>
-    <input type="submit" value="Add drink" />
+    <input type="submit" id="add-drink" value="Add drink" />
   </form>
 </aside>
 <% my $rows = [
@@ -322,13 +322,24 @@ __DATA__
     { title => 'Test #2', description => 'Testing a description #2' },
     { title => 'Test #3', description => 'Testing a description #3' },  
   ]; %>
+
+<script id="drinks-template" type="template/jquery">
+  <tr>
+    <td><input class="title" id="${title}" name="" value="${title}" /></td>
+    <td><textarea class="description" name="">${description}</textarea></td>
+    <td class="actions"><a href="#" class="remove-drink">x</a></td>
+  </tr>
+</script>
+
 <section>
-  <table>
+  <table id="drinks">
     <tr>
       <th>Name</th>
       <th>Description</th>
       <th>&nbsp;</th>
     </tr>
+
+    %# This dummy data will be removed by backbone
     <% for my $row ( @$rows ) { %>
       <tr>
         <td><input class="title" name="" value="<%= $row->{'title'} %>" /></td>
@@ -349,6 +360,7 @@ __DATA__
     <script src="/js/underscore.js"></script>
     <script src="/js/backbone.js"></script>
     <script src="/js/modernizr.custom.76020.js"></script>
+    <script src="/js/jquery.tmpl.min.js"></script>
     <script src="/js/library.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/screen.css"/>
