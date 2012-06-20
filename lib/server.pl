@@ -55,6 +55,7 @@ put '/api/drink/:id'  => \&handle_put_drink;
 
 # Delete a drink
 del '/api/drink/:id'   => \&handle_delete_drink;
+del '/api/drink'       => \&handle_delete_drink;
 
 app->start;
 
@@ -94,7 +95,6 @@ sub handle_post_drink {
 
   my $title       = $self->param( 'title' );
   my $description = $self->param( 'description' );
-
 
   # Use JSON content if parameter not defined
   if ( defined( $self->req->content ) ) {
@@ -153,8 +153,22 @@ sub handle_put_drink {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 sub handle_delete_drink {
   my $self = shift;
-
   my $id          = $self->param( 'id' );
+
+  # Use JSON content if parameter not defined
+  if ( !defined( $id ) && defined( $self->req->content ) ) {
+
+    our $drink;
+
+    eval {
+     $drink = decode_json( $self->req->content->asset->{'content'} );
+    };
+
+    if ( defined( $drink ) ) {
+      $id = $drink->{'id'} if defined($drink->{'id'});
+    }
+
+  }
 
   # Return error if missing parameter (400)
   if ( ! defined($id) ) {
@@ -308,12 +322,12 @@ __DATA__
 % layout 'default';
 % title 'Drinks I Like';
 <aside>
-  <form name="">
+  <form name="" id="new-drink">
     <h1>New Drink</h1>
     <label for="title">Name</label>
-    <input type="text" name="title" />
+    <input type="text" name="title" id="add-title" />
     <label for="description">Description</label>
-    <textarea name="description"></textarea>
+    <textarea name="description" id="add-description"></textarea>
     <input type="submit" id="add-drink" value="Add drink" />
   </form>
 </aside>
@@ -325,8 +339,9 @@ __DATA__
 
 <script id="drinks-template" type="template/jquery">
   <tr>
-    <td><input class="title" id="${title}" name="" value="${title}" /></td>
-    <td><textarea class="description" name="">${description}</textarea></td>
+    <td><input class="title" id="${title}" value="${title}" />
+        <input type="hidden" class="id" value="${id}" /></td>
+    <td><textarea class="description" >${description}</textarea></td>
     <td class="actions"><a href="#" class="remove-drink">x</a></td>
   </tr>
 </script>
@@ -334,9 +349,9 @@ __DATA__
 <section>
   <table id="drinks">
     <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th>&nbsp;</th>
+      <th class="title">Name</th>
+      <th class="description">Description</th>
+      <th class="actions">&nbsp;</th>
     </tr>
 
     %# This dummy data will be removed by backbone

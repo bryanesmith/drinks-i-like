@@ -1,7 +1,9 @@
 $(document).ready( function() {
 
   // >>>>>>>>>> MODEL <<<<<<<<<<
-  var Drink = Backbone.Model.extend({});
+  var Drink = Backbone.Model.extend({
+    urlRoot: '/api/drink'
+  });
 
   // >>>>>>>>>> COLLECTION <<<<<<<<<<
   var DrinkCollection = Backbone.Collection.extend({
@@ -18,22 +20,32 @@ $(document).ready( function() {
     templateId: '#drinks-template',
 
     events: {
-      //'click #add-drink' : 'addDrink',
       'click .remove-drink' : 'removeDrink',
+      'change .title' : 'updateTitle',
+      'change .description' : 'updateDescription'
     },
 
     initialize: function() {
-      var that = this;
-      
+
       // Bind events to collection
-      //this.collection.bind('add', this.add);
-      //this.collection.bind('remove', this.remove);
+      this.collection.bind('add', this.render, this);
+      this.collection.bind('remove', this.render, this);
 
       // Grab template
       this.template =  $.template(this.templateId);
 
       // Render
       this.render();
+    },
+
+    updateTitle: function(ev) {
+      var options = { title: $(ev.currentTarget).val() };
+      find_and_update_drink( ev, this.collection.models, options );
+    },
+
+    updateDescription: function(ev) {
+      var options = { description: $(ev.currentTarget).val() };
+      find_and_update_drink( ev, this.collection.models, options );
     },
 
     render: function() {
@@ -46,26 +58,27 @@ $(document).ready( function() {
         $.tmpl(that.template, drink.toJSON()).appendTo(that.el);
       });
     },
+
     removeDrink: function(ev) {
 
-      var that = this;
       var coll = this.collection;
 
-      _(coll.models).each(function(drink) {
-        var drinkName = drink.get('title');
-        var rowDrinkName = $(ev.currentTarget).parent().parent().find('.title').attr('id');
+      var drinkId = $(ev.currentTarget).parent().parent().find('.id').val();
+      var drink = find_matching_drink(coll.models, drinkId);
 
-        if ( drinkName === rowDrinkName ) {
-          coll.remove( drink );
-        } 
-
-      });
-
-      // TODO: Use events to call render instead
-      this.render();
+      if ( drink ) {
+        drink.destroy({
+          success: function(model, response) { coll.remove( drink ); },
+          error:   function() { alert( "Could not remove drink: " + drink.get('title') )}
+        });
+      } else {
+        alert( 'Cannot remove drink: no drink with id = ' + id );
+      }
 
       return false;
-    }
+
+    },
+
   });
 
   // >>>>>>>>>> GO! <<<<<<<<<
@@ -73,12 +86,59 @@ $(document).ready( function() {
   // Grab drinks from server
   drinks.fetch({
     success: function() {
-      drinks.each(function(drink) {
-        console.log( drink.get("title") );
-      });
-
       var drinksView = new DrinksView( { collection: drinks } );
     } // success
   });
 
+  // Attach to button
+  $('#add-drink').click(function () {
+    var drink = new Drink({
+      title: $('#add-title').val(),
+      description: $('#add-description').val()
+    });
+    drinks.add(drink);
+
+    // Reset form
+    $('#new-drink').each (function(){
+      this.reset();
+    });
+
+    drink.save();
+    drink.fetch(); // To get id for latest drink
+    return false;
+  });
+
 });
+
+/**
+ *
+ */
+function find_and_update_drink( ev, drinks, options ) {
+  var drinkId = $(ev.currentTarget).parent().parent().find('.id').val();
+  var drink = find_matching_drink( drinks, drinkId );
+
+  drink.set(options);
+  drink.save();
+}
+
+/**
+ * Helper function to find a drink in an array using its id.
+ */
+function find_matching_drink(drinks, id) {
+
+  var drink = null;
+  _(drinks).each(function(thisDrink) {
+
+    // Find the matching drink
+    var thisDrinkID = thisDrink.get('id');
+
+    if ( thisDrinkID == id ) {
+      drink =  thisDrink;
+    } 
+
+  });
+
+  return drink;
+
+}
+

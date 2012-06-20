@@ -16,12 +16,12 @@ section {
   width: 31.25em; /* 15em * 2 + 1.25em */
 }
 
-section input {
+section input, section textarea {
   border-width: 0;
   background-color: transparent;
 }
 
-section input.title {
+section .title {
   width: 10em;
 }
 
