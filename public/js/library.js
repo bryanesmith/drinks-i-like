@@ -92,19 +92,29 @@ $(document).ready( function() {
 
   // Attach to button
   $('#add-drink').click(function () {
+
+    var title = $('#add-title').val();
+    var desc  = $('#add-description').val();
+
     var drink = new Drink({
-      title: $('#add-title').val(),
-      description: $('#add-description').val()
+      title: title,
+      description: desc
     });
-    drinks.add(drink);
+
 
     // Reset form
     $('#new-drink').each (function(){
       this.reset();
     });
 
-    drink.save();
-    drink.fetch(); // To get id for latest drink
+    drink.save({wait: true});
+
+    drink.fetch({
+      success: function() {
+        drinks.add(drink);
+      }
+    });
+
     return false;
   });
 
@@ -114,11 +124,18 @@ $(document).ready( function() {
  *
  */
 function find_and_update_drink( ev, drinks, options ) {
+
   var drinkId = $(ev.currentTarget).parent().parent().find('.id').val();
   var drink = find_matching_drink( drinks, drinkId );
 
-  drink.set(options);
-  drink.save();
+  if ( drink ) {
+    drink.set(options);
+    drink.save({wait: true});
+    drink.fetch();
+  } else {
+    alert( "Didn't find drink with id = " + drinkId );
+  }
+
 }
 
 /**
