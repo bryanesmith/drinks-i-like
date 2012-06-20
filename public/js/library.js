@@ -40,12 +40,12 @@ $(document).ready( function() {
 
     updateTitle: function(ev) {
       var options = { title: $(ev.currentTarget).val() };
-      find_and_update_drink( ev, this.collection.models, options );
+      find_and_update_drink( ev, this, options );
     },
 
     updateDescription: function(ev) {
       var options = { description: $(ev.currentTarget).val() };
-      find_and_update_drink( ev, this.collection.models, options );
+      find_and_update_drink( ev, this, options );
     },
 
     render: function() {
@@ -101,7 +101,6 @@ $(document).ready( function() {
       description: desc
     });
 
-
     // Reset form
     $('#new-drink').each (function(){
       this.reset();
@@ -121,16 +120,18 @@ $(document).ready( function() {
 });
 
 /**
- *
+ * Helper function to find the modified drink and save the changes
  */
-function find_and_update_drink( ev, drinks, options ) {
+function find_and_update_drink( event, drinksView, newValues ) {
 
-  var drinkId = $(ev.currentTarget).parent().parent().find('.id').val();
-  var drink = find_matching_drink( drinks, drinkId );
+  var drinks  = drinksView.collection.models;
+  var drinkId = $(event.currentTarget).parent().parent().find('.id').val();
+  var drink   = find_matching_drink( drinks, drinkId );
 
   if ( drink ) {
-    drink.set(options);
+    drink.set(newValues);
     drink.save({wait: true});
+    drinksView.collection.fetch(); // Update collection
   } else {
     alert( "Didn't find drink with id = " + drinkId );
   }
