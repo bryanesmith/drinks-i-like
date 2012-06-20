@@ -131,7 +131,6 @@ function find_and_update_drink( ev, drinks, options ) {
   if ( drink ) {
     drink.set(options);
     drink.save({wait: true});
-    drink.fetch();
   } else {
     alert( "Didn't find drink with id = " + drinkId );
   }
