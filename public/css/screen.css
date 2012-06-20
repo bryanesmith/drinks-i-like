@@ -1,15 +1,58 @@
 html, body {
-  height: 100%;
+
+}
+
+body {
+  padding: 0 2em;
+  background: #999;
 }
 
 header, div[role=main] {
   width: 50em; 
+  background: #fff;
+  padding: 1em;
+}
+
+header {
+  margin-top: 1em;
+  padding-bottom: 0;
+  border-top-right-radius: .5em;
+  border-top-left-radius: .5em;
+}
+
+header h1 {
+  line-height: 2em;
+  font-size: 1.85em;
+}
+
+div[role=main] {
+  border-bottom-right-radius: .5em;
+  border-bottom-left-radius: .5em;
+  min-height: 25em;
+  padding-top: 0;
 }
 
 aside {
-  width: 15em;
+  width: 16em;
   margin-left: 1.25em;
   float: right;
+  border-left: 1px dashed #aaa;
+  padding-left: 1.25em;
+}
+
+aside h1 {
+  font-size: 1.5em;
+  font-weight: normal;
+}
+
+aside input, aside textarea {
+  width: 14em;
+}
+
+aside input[type=submit] {
+  display: block;
+  width: auto;
+  margin-top: 2em;
 }
 
 section {
@@ -22,7 +65,7 @@ section input, section textarea {
 }
 
 section .title {
-  width: 10em;
+  width: 8em;
 }
 
 section textarea.description {
@@ -31,8 +74,14 @@ section textarea.description {
 
 th {
   text-align: left;
+  border-bottom: 1px solid #aaa;
 }
 
 td {
-  padding: 1em 1em 0 0;
+  padding: 1em;
+  vertical-align: top;
+}
+
+table tr:nth-child(2n) td {
+  background: #eee;
 }
