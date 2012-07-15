@@ -10,5 +10,4 @@ current_dir=`dirname "$0"`
 server_app="${current_dir}/../lib/server.pl"
 
 # Launch server
-$server_app daemon -l http://*:${PORT}
-
+morbo $server_app -l http://*:${PORT}
