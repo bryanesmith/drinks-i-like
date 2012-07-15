@@ -32,7 +32,8 @@ sub get_dbh {
 plugin 'pod_renderer';
 
 # Set public/ directory path to project root
-app->static->root( app->home->rel_dir('../public') );
+app->static->paths->[0] = app->home->rel_dir('../public');
+#app->static->root( app->home->rel_dir('../public') );
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # Routes
